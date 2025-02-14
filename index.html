@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather</title>
+    <style>
+        * {
+            user-select: none;
+        }
+
+        body {
+            background: rgba(80, 227, 194, 0.45);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(3.5px);
+            -webkit-backdrop-filter: blur(3.5px);
+            border-radius: 10px;
+        }
+
+        .outer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 97vh;
+
+        }
+
+        .inner {
+            width: 330px;
+            height: 350px;
+            background: rgba(101, 209, 233, 0.45);
+          
+            border-radius: 10px;
+           
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgb(13, 163, 250);
+
+        }
+
+        .inner:hover {
+           
+           
+            backdrop-filter: blur(1.2px);
+            -webkit-backdrop-filter: blur(3.5px);
+        }
+
+        .search-container {
+            display: flex;
+            margin-left: 17px;
+            gap: 5px;
+
+        }
+
+        .op {
+            height: 30px;
+            width: 180px;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        ::placeholder {
+            text-align: center;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            font-weight: lighter;
+            color: rgb(72, 182, 241);
+        }
+
+        .button {
+            background-image: url('searchbar.jpg');
+            background-size: cover;
+            background-position: center;
+            width: 35px;
+            height: 35px;
+            border: none;
+            cursor: pointer;
+            border-radius: 50%;
+            margin-top: 0px;
+            padding-top: 0px;
+        }
+
+        #header {
+            color: rgb(50, 70, 250);
+        }
+
+        #weatherResult {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        #err {
+            margin-bottom: 85px;
+            color: rgb(244, 15, 80);
+            font-size: 18px;
+        }
+
+        #msg {
+            margin-bottom: 25px;
+        }
+
+        #heads {
+            margin-right: 20px;
+            color: rgb(183, 49, 241);
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        }
+
+        #im1 {
+            position: absolute;
+            margin-bottom: 140px;
+            margin: right 7px;
+        }
+
+        #temp {
+            font-size: 30px;
+            padding-bottom: 0;
+            margin-bottom: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #imgg {
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="outer">
+        <img id="im1" height="120px" width="120px" src="weather02-1024.webp" alt="Weather Icon">
+
+        <div class="inner">
+
+            <div id="weatherResult"></div>
+
+            <h2 id="heads">Weather App</h2>
+            <div class="search-container">
+                <input type="text" id="inp" class="op" placeholder="Enter Location">
+                <button class="button" onclick="getweather()"></button>
+            </div>
+
+            <p id="loadingMessage" style="display:none">Loading..</p>
+        </div>
+    </div>
+
+    <script>
+        const heads = document.getElementById("heads");
+        const im1 = document.getElementById("im1");
+        function getweather() {
+            heads.style.display = "none";
+            im1.style.display = "none";
+            const str = document.getElementById("inp").value;
+            let loc = str[0].toUpperCase() + str.slice(1);
+            const apikey = '3a081097eebd5430adba54f0dbac42f5';
+            document.getElementById("loadingMessage").style.display = "block"; // Show loading message
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${loc}&appid=${apikey}&units=metric`)
+                .then(response => response.json())
+                .then((data) => {
+                    document.getElementById("loadingMessage").style.display = "none"; // Hide loading message
+                    if (data.main) {
+                        let iconCode = data.weather[0].icon;
+                        let iconUrl = `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
+                        // console.log(data)
+
+                        document.getElementById("weatherResult").innerHTML = `<div id="msg">
+                            <h2 id="header">Weather in ${loc}</h2>
+                            <p id="temp">${data.main.temp.toFixed(2)}°C</p>
+                            <p>Humidity: ${data.main.humidity}%</p>
+                            <p>Weather: ${data.weather[0].description}</p>
+                            <div id="imgg"></div>
+
+                        </div>`;
+                        let im = document.createElement("img")
+                        im.src = iconUrl;
+                        im.alt = "Weather Icon";
+                        document.getElementById("imgg").appendChild(im)
+                    } else {
+                        document.getElementById("weatherResult").innerHTML = `<p id="err">Error: Invalid Location or API Issue.</p>`;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById("loadingMessage").style.display = "none";
+                    document.getElementById("weatherResult").innerHTML = "Error: Unable to fetch weather data.";
+                });
+        }
+    </script>
+</body>
+
+</html>
